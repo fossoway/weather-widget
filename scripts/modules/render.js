@@ -1,7 +1,7 @@
 import { getCurrentDateTime } from "./utils.js";
 
 
-const renderWidgetToday = (widget) => {
+const renderWidgetToday = (widget, data) => {
     const {dayOfMonth, month, year, dayOfWeek, hours, minutes} = getCurrentDateTime();
 
 
@@ -15,40 +15,79 @@ const renderWidgetToday = (widget) => {
                 <p class="widget__day">${dayOfWeek}</p>
         </div>
         <div class="widget__icon">
-            <img class="widget__img" src="./icon/01d.svg" alt="Погода">
+            <img class="widget__img" src="./icon/${data.weather[0].icon}.svg" alt="Погода">
         </div>
         <div class="widget__wheather">
             <div class="widget__city">
-                <p>Калининград</p>
+                <p>${data.name}</p>
                 <button class="widget__change-city" aria-label="Изменить город"></button>
             </div>
-            <p class="widget__temp-big">19.3°C</p>
+            <p class="widget__temp-big">${(data.main.temp - 273.15).toFixed(1)}°C</p>
             <p class="widget__felt">ощущается</p>
-            <p class="widget__temp-small">18.8 °C</p>
+            <p class="widget__temp-small">${(data.main.feels_like - 273.15).toFixed(1)}°C</p>
         </div>
         `
     )
 };
 
-const renderWidgetOther = (widget) => {
+
+const renderWindDirection = (degree) => {
+    if (degree >= 337.5 || degree < 22.5) {
+        return '&#129121;';
+    };
+
+    if (degree >= 22.5 && degree < 67.5) {
+        return '&#129125;';
+    };
+
+    if (degree >= 67.5 && degree < 112.5) {
+        return '&#129122;';
+    };
+
+    if (degree >= 112.5 && degree < 157.5) {
+        return '&#129126;';
+    };
+
+    if (degree >= 157.5 && degree < 202.5) {
+        return '&#129123;';
+    };
+
+    if (degree >= 202.5 && degree < 247.5) {
+        return '&#129127;';
+    };
+
+    if (degree >= 247.5 && degree < 292.5) {
+        return '&#129120;';
+    };
+
+    if (degree >= 292.5 && degree < 337.5) {
+        return '&#129124;';
+    };
+}
+
+
+const renderWidgetOther = (widget, data) => {
+const windDirection = renderWindDirection(data.wind.deg);
+const dewPoint = (data.main.temp - 273.15) - (1 - data.main.humidity / 100) / 0.05;
+
     widget.insertAdjacentHTML(
         'beforeend',
         `
         <div class="widget__other">
             <div class="widget__wind">
                 <p class="widget__wind-title">Ветер</p>
-                <p class="widget__wind-speed">3.94 м/с</p>
-                <p class="widget__wind-text">&#8599;</p>
+                <p class="widget__wind-speed">${data.wind.speed} м/с</p>
+                <p class="widget__wind-text">${windDirection}</p>
 
             </div>
             <div class="widget__humidity">
                 <p class="widget__humidity-title">Влажность</p>
-                <p class="widget__humidity-value">27%</p>
-                <p class="widget__humidity-text">Т.Р: -0.2 °C</p>
+                <p class="widget__humidity-value">${data.main.humidity}%</p>
+                <p class="widget__humidity-text">Т.Р: ${dewPoint.toFixed(2)} °C</p>
             </div>
             <div class="widget__pressure">
                 <p class="widget__pressure-title">Давление</p>
-                <p class="widget__pressure-value">768.32</p>
+                <p class="widget__pressure-value">${(data.main.pressure * 0.750063755419211).toFixed(2)}</p>
                 <p class="widget__pressure-text">мм рт.ст.</p>
             </div>
         </div>
@@ -92,4 +131,10 @@ const renderWidgetForecast = (widget) => {
 };
 
 
-export { renderWidgetForecast, renderWidgetToday, renderWidgetOther };
+const showError = (widget, error) => {
+    widget.textContent = error.toString();
+    widget.classList.add('widget_error');
+}
+
+
+export { renderWidgetForecast, renderWidgetToday, renderWidgetOther, showError };
