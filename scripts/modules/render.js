@@ -1,4 +1,4 @@
-import { getCurrentDateTime } from "./utils.js";
+import { getCurrentDateTime, getWeatherForecastData } from "./utils.js";
 
 
 const renderWidgetToday = (widget, data) => {
@@ -32,37 +32,20 @@ const renderWidgetToday = (widget, data) => {
 
 
 const renderWindDirection = (degree) => {
-    if (degree >= 337.5 || degree < 22.5) {
-        return '&#129121;';
-    };
+    const directions = [
+        '&#129123;',
+        '&#129127;',
+        '&#129120;',
+        '&#129124;',
+        '&#129121;',
+        '&#129125;',
+        '&#129122;',
+        '&#129126;',
+        '&#129123;',
+    ];
 
-    if (degree >= 22.5 && degree < 67.5) {
-        return '&#129125;';
-    };
-
-    if (degree >= 67.5 && degree < 112.5) {
-        return '&#129122;';
-    };
-
-    if (degree >= 112.5 && degree < 157.5) {
-        return '&#129126;';
-    };
-
-    if (degree >= 157.5 && degree < 202.5) {
-        return '&#129123;';
-    };
-
-    if (degree >= 202.5 && degree < 247.5) {
-        return '&#129127;';
-    };
-
-    if (degree >= 247.5 && degree < 292.5) {
-        return '&#129120;';
-    };
-
-    if (degree >= 292.5 && degree < 337.5) {
-        return '&#129124;';
-    };
+    const i = Math.round(degree / 45 % 8);
+    return directions[i];
 }
 
 
@@ -95,39 +78,25 @@ const dewPoint = (data.main.temp - 273.15) - (1 - data.main.humidity / 100) / 0.
     )
 };
 
-const renderWidgetForecast = (widget) => {
-    widget.insertAdjacentHTML(
-        'beforeend',
-        `
-        <ul class="widget__forecast">
-            <li class="widget__day-item">
-                <p class="widget__day-text">ср</p>
-                <img class="widget__day-img" src="./icon/02d.svg" alt="Погода">
-                <p class="widget__day-temp">18.4°/13.7°</p>
-            </li>
-            <li class="widget__day-item">
-                <p class="widget__day-text">чт</p>
-                <img class="widget__day-img" src="./icon/03d.svg" alt="Погода">
-                <p class="widget__day-temp">17.3°/11.3°</p>
-            </li>
-            <li class="widget__day-item">
-                <p class="widget__day-text">пт</p>
-                <img class="widget__day-img" src="./icon/04d.svg" alt="Погода">
-                <p class="widget__day-temp">16.5°/10.9°</p>
-            </li>
-            <li class="widget__day-item">
-                <p class="widget__day-text">сб</p>
-                <img class="widget__day-img" src="./icon/01d.svg" alt="Погода">
-                <p class="widget__day-temp">18.6°/12.5°</p>
-            </li>
-            <li class="widget__day-item">
-                <p class="widget__day-text">вс</p>
-                <img class="widget__day-img" src="./icon/03d.svg" alt="Погода">
-                <p class="widget__day-temp">17.3°/11.2°</p>
-            </li>
-        </ul>
-        `
-    )
+const renderWidgetForecast = (widget, data) => {
+    const widgetForecast = document.createElement('ul');
+    widgetForecast.className = 'widget__forecast';
+
+    const forecastDataFiveDay = getWeatherForecastData(data);
+
+    const items = forecastDataFiveDay.map((item) => {
+        const widgetDayItem = document.createElement('li');
+        widgetDayItem.className = 'widget__day-item';
+        widgetDayItem.insertAdjacentHTML('beforeend', `
+                <p class="widget__day-text">${item.dayOfWeek}</p>
+                <img class="widget__day-img" src="./icon/${item.weatherIcon}.svg" alt="Погода">
+                <p class="widget__day-temp">${(item.minTemp - 273.15).toFixed(1)}°/${(item.maxTemp - 273.15).toFixed(1)}°</p>
+        `)
+        return widgetDayItem;
+    });
+
+    widgetForecast.append(...items);
+    widget.append(widgetForecast);
 };
 
 
