@@ -1,6 +1,6 @@
 const addZero = (n) => n < 10 ? `0${n}` : n;
 
-export const getCurrentDateTime = () => {
+export const getCurrentDateTime = (data) => {
     const months = [
         'янв',
         'фев',
@@ -28,13 +28,15 @@ export const getCurrentDateTime = () => {
 
     const date = new Date();
 
-    const dayOfMonth = date.getDate();
-    const month = months[date.getMonth()];
-    const year = date.getFullYear();
-    const dayOfWeek = weekdays[date.getDay()];
+    const cityTime = new Date(Date.now() + date.getTimezoneOffset() * 60000 + data.timezone * 1000);
 
-    const hours = addZero(date.getHours());
-    const minutes = addZero(date.getMinutes());
+    const dayOfMonth = cityTime.getDate();
+    const month = months[cityTime.getMonth()];
+    const year = cityTime.getFullYear();
+    const dayOfWeek = weekdays[cityTime.getDay()];
+
+    const hours = addZero(cityTime.getHours());
+    const minutes = addZero(cityTime.getMinutes());
 
     return {dayOfMonth, month, year, dayOfWeek, hours, minutes};
 };
@@ -42,15 +44,13 @@ export const getCurrentDateTime = () => {
 
 export const getWeatherForecastData = (data) => {
     const forecast = data.list.filter((item) => {
-        return new Date(item.dt_txt).getHours() === 12 &&
-            new Date(item.dt_txt).getDate() > new Date().getDate();
+        const daytimeHours = [12, 13, 14];
+        const currentDate = new Date();
+        const dateUTC = new Date(currentDate.getTime() + currentDate.getTimezoneOffset() * 60000);
+
+        return daytimeHours.includes(new Date(item.dt * 1000).getHours()) &&
+            new Date(item.dt_txt).getDate() > dateUTC.getDate();
     });
-
-    if (forecast.length < 5) {
-        forecast.push(data.list[39])
-    };
-
-    console.log(forecast);
 
     const forecastData = forecast.map((item) => {
         const date = new Date(item.dt_txt);
@@ -66,6 +66,8 @@ export const getWeatherForecastData = (data) => {
 
         const dayOfWeek = weekdaysShort[date.getDay()];
         const weatherIcon = item.weather[0].icon;
+        const itemAlt = item.weather[0].description;
+
         let minTemp = Infinity;
         let maxTemp = -Infinity;
 
@@ -84,13 +86,12 @@ export const getWeatherForecastData = (data) => {
             };
         };
 
-
-
         return {
             dayOfWeek,
             weatherIcon,
             minTemp,
             maxTemp,
+            itemAlt,
         };
     });
 
