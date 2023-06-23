@@ -39,9 +39,8 @@ function init() {
             lat: coordList[0],
             lon: coordList[1],
         };
+        myMap.balloon.destroy();
 
         await startWidget(coord, widget);
-    })
-
-    myMap.balloon.destroy();
+    });
 };
