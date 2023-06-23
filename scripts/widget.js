@@ -1,4 +1,3 @@
-import { cityServiceSearch } from './modules/cityServiceSearch.js';
 import { startCityWidget } from './modules/utils.js';
 import { startWidget } from './modules/widgetService.js';
 
