@@ -4,7 +4,6 @@ import { getCurrentDateTime, getWeatherForecastData } from "./utils.js";
 const renderWidgetToday = (widget, data) => {
     const {dayOfMonth, month, year, dayOfWeek, hours, minutes} = getCurrentDateTime(data);
 
-
     widget.insertAdjacentHTML(
         'beforeend',
         `
@@ -22,7 +21,7 @@ const renderWidgetToday = (widget, data) => {
         <div class="widget__wheather">
             <div class="widget__city">
                 <p>${data.name}</p>
-                <button class="widget__change-city" aria-label="Изменить город"></button>
+                
             </div>
             <p class="widget__temp-big">${(data.main.temp - 273.15).toFixed(1)}°C</p>
             <p class="widget__felt">ощущается</p>
@@ -65,15 +64,17 @@ const renderWidgetForecast = (widget, data) => {
     const widgetForecast = document.createElement('ul');
     widgetForecast.className = 'widget__forecast';
 
-    const forecastDataFiveDay = getWeatherForecastData(data);
+    const forecastDataFiveHours = getWeatherForecastData(data);
 
-    const items = forecastDataFiveDay.map((item) => {
+    console.log(forecastDataFiveHours)
+
+    const items = forecastDataFiveHours.map((item) => {
         const widgetDayItem = document.createElement('li');
         widgetDayItem.className = 'widget__day-item';
         widgetDayItem.insertAdjacentHTML('beforeend', `
-                <p class="widget__day-text">${item.dayOfWeek}</p>
+                <p class="widget__day-text">${item.dayOfWeek}, ${item.hoursOfDay}:00</p>
                 <img class="widget__day-img" src="./icon/${item.weatherIcon}.svg" alt="${item.itemAlt}">
-                <p class="widget__day-temp">${(item.minTemp - 273.15).toFixed(1)}°/${(item.maxTemp - 273.15).toFixed(1)}°</p>
+                <p class="widget__day-temp">${(item.temp - 273.15).toFixed(1)}°</p>
         `)
         return widgetDayItem;
     });

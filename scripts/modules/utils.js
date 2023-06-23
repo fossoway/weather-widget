@@ -1,4 +1,21 @@
+import { getCity } from "./APIservice.js";
+
 const addZero = (n) => n < 10 ? `0${n}` : n;
+
+export const startCityWidget = async () => {
+
+    const cityCoord = await getCity('latitude');
+
+    if (cityCoord.success) {
+        const coord = {
+            lat: cityCoord.coord.latitude,
+            lon: cityCoord.coord.longitude,
+        }
+        return coord;
+    } else {
+        showError(widget, cityCoord.error);
+    }
+};
 
 export const getCurrentDateTime = (data) => {
     const months = [
@@ -43,17 +60,16 @@ export const getCurrentDateTime = (data) => {
 
 
 export const getWeatherForecastData = (data) => {
-    const forecast = data.list.filter((item) => {
-        const daytimeHours = [12, 13, 14];
-        const currentDate = new Date();
-        const dateUTC = new Date(currentDate.getTime() + currentDate.getTimezoneOffset() * 60000);
+    const date = new Date();
+    const cityTime = new Date(Date.now() + date.getTimezoneOffset() * 60000 + data.city.timezone * 1000);
+    const year = cityTime.getFullYear();
+    const month = cityTime.getMonth();
+    const day = cityTime.getDate();
+    let hours = cityTime.getHours();
 
-        return daytimeHours.includes(new Date(item.dt * 1000).getHours()) &&
-            new Date(item.dt_txt).getDate() > dateUTC.getDate();
-    });
-
-    const forecastData = forecast.map((item) => {
-        const date = new Date(item.dt_txt);
+    const forecastData = data.list.map((item) => {
+        hours += 3;
+        const date = new Date(year, month, day, hours);
         const weekdaysShort = [
             'вс',
             'пн',
@@ -65,32 +81,19 @@ export const getWeatherForecastData = (data) => {
         ];
 
         const dayOfWeek = weekdaysShort[date.getDay()];
+        const hoursOfDay = addZero(date.getHours());
+        const minutesOfDay = addZero(date.getMinutes());
         const weatherIcon = item.weather[0].icon;
         const itemAlt = item.weather[0].description;
 
-        let minTemp = Infinity;
-        let maxTemp = -Infinity;
-
-        for (let i = 0; i < data.list.length; i += 1) {
-            const min = data.list[i].main.temp_min;
-            const max = data.list[i].main.temp_max;
-            const tempDate = new Date(data.list[i].dt_txt);
-
-            if (tempDate.getDate() === date.getDate()) {
-                if (min < minTemp) {
-                    minTemp = min;
-                }
-                if (max > maxTemp) {
-                    maxTemp = max;
-                }
-            };
-        };
+        const temp = item.main.temp;
 
         return {
             dayOfWeek,
+            hoursOfDay,
+            minutesOfDay,
             weatherIcon,
-            minTemp,
-            maxTemp,
+            temp,
             itemAlt,
         };
     });
