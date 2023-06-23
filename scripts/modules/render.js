@@ -66,8 +66,6 @@ const renderWidgetForecast = (widget, data) => {
 
     const forecastDataFiveHours = getWeatherForecastData(data);
 
-    console.log(forecastDataFiveHours)
-
     const items = forecastDataFiveHours.map((item) => {
         const widgetDayItem = document.createElement('li');
         widgetDayItem.className = 'widget__day-item';
