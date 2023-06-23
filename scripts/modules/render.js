@@ -74,7 +74,10 @@ const renderWidgetForecast = (widget, data) => {
         widgetDayItem.insertAdjacentHTML('beforeend', `
                 <p class="widget__day-text">${item.dayOfWeek}, ${item.hoursOfDay}:00</p>
                 <img class="widget__day-img" src="./icon/${item.weatherIcon}.svg" alt="${item.itemAlt}">
-                <p class="widget__day-temp">${(item.temp - 273.15).toFixed(1)}°</p>
+                <div class="widget__day-temp">${(item.temp - 273.15).toFixed(1)}° 
+                    <p style="transform: rotate(${item.windDeg}deg); color: red">&#8659;</p> 
+                    ${item.windSpeed}
+                </div>
         `)
         return widgetDayItem;
     });

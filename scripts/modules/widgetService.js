@@ -21,9 +21,6 @@ const startWidget = async (coord, widget) => {
 
     const dataForecast = await fetchForecast(coord);
 
-    console.log(dataForecast);
-    //console.log(new Date(dataForecast.data.list[2].dt * 1000).toTimeString("ru-RU"));
-
     if (dataForecast.success) {
         renderWidgetForecast(widget, dataForecast.data);
     } else {

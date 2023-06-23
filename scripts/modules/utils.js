@@ -82,19 +82,21 @@ export const getWeatherForecastData = (data) => {
 
         const dayOfWeek = weekdaysShort[date.getDay()];
         const hoursOfDay = addZero(date.getHours());
-        const minutesOfDay = addZero(date.getMinutes());
         const weatherIcon = item.weather[0].icon;
         const itemAlt = item.weather[0].description;
+        const windSpeed = item.wind.speed;
+        const windDeg = item.wind.deg;
 
         const temp = item.main.temp;
 
         return {
             dayOfWeek,
             hoursOfDay,
-            minutesOfDay,
             weatherIcon,
             temp,
             itemAlt,
+            windSpeed,
+            windDeg,
         };
     });
 
