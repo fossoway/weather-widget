@@ -32,7 +32,6 @@ function init() {
     myMap.controls.add(searchControl);
     
     searchControl.events.add('resultselect', async function (e) {
-        console.log('search!');
         var index = e.get('index');
         var results = searchControl.getResultsArray();
         const coordList = results[0].geometry.getCoordinates();
